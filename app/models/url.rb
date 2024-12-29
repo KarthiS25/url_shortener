@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class Url < ApplicationRecord
-  before_create :generate_short_url
-  before_validation :generate_api_token, on: :create
+  before_create :generate_short_url, :generate_api_token
+  has_secure_token :api_token
   
   validates :long_url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp }
   validates :api_token, presence: true, uniqueness: true, on: :create

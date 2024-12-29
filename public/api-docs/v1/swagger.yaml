@@ -1,0 +1,86 @@
+openapi: 3.0.1
+info:
+  title: URL Shortener API
+  description: API documentation for the URL Shortener service.
+  version: '1.0.0'
+servers:
+  - url: http://localhost:3000/api/v1
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+paths:
+  /urls:
+    post:
+      summary: Create a shortened URL
+      tags:
+        - Shorten URLs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                long_url:
+                  type: string
+                  example: "https://example.com/some/very/long/url"
+      responses:
+        '200':
+          description: Shortened URL created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  short_url:
+                    type: string
+                    example: "http://localhost:3000/abcd1234"
+        '422':
+          description: Invalid request
+    get:
+      summary: "List all redirection URLs"
+      tags:
+        - Shorten URLs
+      responses:
+        '200':
+          description: URL List
+        '404':
+          description: URL list is empty
+  /urls/{short_url}:
+    get:
+      summary: Redirect to the original URL
+      tags:
+        - Shorten URLs
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: short_url
+          in: path
+          required: true
+          description: Shortened URL code
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Redirect to the original URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  original_url:
+                    type: string
+                    example: "http://example.com"
+        '404':
+          description: Shortened URL not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Shortened URL not found"
